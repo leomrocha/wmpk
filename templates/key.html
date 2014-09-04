@@ -1,0 +1,18 @@
+<div id="key_{{key.midi_id}}" class="key {{key.key_color}}" ng-controller="keyController"
+     ng-mousedown="keyPressed(key)" ng-mouseup="keyReleased(key)" ng-mouseleave="keyReleased(key)">
+    
+    <div class="keysynesthesicsTop" style="width: 100%; height: 10px; background-color:rgb({{key.synesthesia.R}},{{key.synesthesia.G}},{{key.synesthesia.B}});" ></div>
+    
+    <div class="keysynesthesicsOverlay" style="width: 100%; height: 100%; background-color:rgb({{key.synesthesia.R}},{{key.synesthesia.G}},{{key.synesthesia.B}});" ng-show="pressed"></div>
+    
+    <div class="keylabel">
+        <div ng-hide="hideKeyLabel">
+        {{key.label}}
+        </div>
+        <br/>        
+        <div ng-repeat="name in key.names" width="{{width}}" ng-hide="hideKeyName">
+            <span>{{name}}</span><span>{{key.octave}}</span>
+        </div>
+    </div>
+
+<div>

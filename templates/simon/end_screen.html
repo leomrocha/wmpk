@@ -1,0 +1,17 @@
+<div id="endScreen"  ng-show="gameState === 'win'">
+	<div class="content">
+		<h2>GREAT WORK!</h2>
+		Final score: <span id="finalScore">0</span>
+		<a href="#" id="reset" class="button">Next Level!</a>
+	</div>
+</div>
+
+<div id="endScreen" ng-show="gameState === 'loose'">
+	<div class="content">
+		<h2>Sorry!</h2>
+		Final score: <span id="finalScore">0</span>
+		<a href="#" id="reset" class="button">Play Again!</a>
+	</div>
+</div>
+
+

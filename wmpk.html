@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta charset="utf-8">
+		<title> WMPK - Web MIDI Piano Keyboard </title>
+		<meta name="generator" content="Bootply" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<link href="assets/css/bootstrap.min.css" rel="stylesheet">
+		<!--[if lt IE 9]>
+			<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+	    <link href="css/keyboard.css" rel="stylesheet">
+	</head>
+	<body>
+        <div class="navbar navbar-default navbar-static-top">
+          <div class="container">
+            <div class="navbar-header">
+              <!--<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>-->
+              <a class="navbar-brand" href="/">WMPK - Web MIDI Piano Keyboard</a>
+            </div>
+            <!--<div class="collapse navbar-collapse">
+              <ul class="nav navbar-nav">
+                <li class="active"><a href="#">Home</a></li>
+                <li><a href="#contact">Contact</a></li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                <li><a href="#about">About</a></li>
+              </ul>
+            </div>--><!--/.nav-collapse -->
+          </div>
+        </div>
+
+        <div class="container"  ng-app="WMPK" ng-controller="mainController">
+          
+            <div class="text-center">
+            <h1>Bootstrap starter template</h1>
+            <p class="lead">Use this document as a way to quickly start any new project.<br> All you get is this text and a mostly barebones HTML document.</p>
+            </div>
+
+            <div  >
+                <div class="keyboard" ng-controller="keyboardController">
+                    <div keyboard>
+                        Sorry, your Browser does not support HTML5, please use the latests Chrome Browser
+                    </div>
+                </div>
+            </div>
+          
+        </div><!-- /.container -->
+	<!-- script references -->
+		<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>-->
+	    <script src="/assets/js/underscore-min.js"></script>
+	    <script src="/assets/js/jquery.min.js"></script>
+
+        <!-- Markdown, for the blog -->
+        <!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.10/angular.min.js"></script>-->
+        <!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.10/angular-route.js"></script>-->
+        <script src="/assets/js/angular.min.js"></script>
+        <!--<script src="/assets/js/bootstrap.min.js"></script>-->
+	        
+        <!-- deps-->
+        <script src="/assets/js/base64-binary.js"></script>
+        <script src="/assets/js/MIDI.min.js"></script>
+        <!-- And my actual application, the order is important -->
+        <script src="/src/piano_setup.js"></script>
+        <script src="/src/keys_dimensions.js"></script>
+        <script src="/src/keyboard_mappings.js"></script>
+        <script src="/src/notes_info.js"></script>
+        <script src="/src/piano_demo.js"></script>
+	</body>
+</html>
+

@@ -1,0 +1,76 @@
+a:hover {
+    cursor:pointer;
+}
+
+.white {
+    width: 40px;
+    height: 200px;
+    background-color: #ffffff;
+    color: rgb(32,32,32);
+    z-index: 0;
+    text-shadow: 0px 1px 1px rgba(32,32,32,0.5);
+}
+.black {
+    width: 30px;
+    height: 120px;
+    background-color: rgb(32,32,32);
+    color: #ffffff;
+    z-index: 10;
+    text-shadow: 0px -1px 1px rgba(255,255,255,0.5);
+}
+.key {
+    position: absolute;
+    font-family: Helvetica;
+    font-weight: 100;
+    font-size: 12px;
+    border: 1px solid rgba(32,32,32,0.2);
+    border-radius: 0px 0px 5px 5px;
+    cursor: pointer;
+    box-shadow: 0px 5px 1px rgba(32,32,32,0.2);
+    -webkit-transition: margin 0.05s ease, background-color 0.05s ease, box-shadow 0.05s ease;
+}
+.keylabel {
+    position: absolute;
+    bottom: 5px;
+    text-align: center;
+    left: 0px;
+    right: 0px;
+}
+.keysynesthesicsTop {
+    color: rgb(250,250,250);
+    border: 1.5px solid rgba(250,250,250,0.2);
+    border-radius: 0px 0px 2px 2px;
+    text-align: center;
+}
+.keysynesthesicsOverlay {
+    position: absolute;
+    border-radius: 0px 0px 5px 5px;
+    border: 2px solid rgba(32,32,32,0.2);
+    width: 100%;
+    height: 100%;
+
+    bottom: -7px;
+    margin-left: auto;
+    margin-right: auto;
+
+}
+user agent stylesheetdiv {
+    display: block;
+}
+
+.overlay-button {
+    -webkit-transition: opacity 400ms;
+    transition: opacity 400ms;
+    pointer-events: none;
+    opacity: 0;
+    display: block;
+    color: #fff;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100000;
+    opacity: 0;
+    display: none;
+}
