@@ -355,7 +355,7 @@ wmpk.controller('mainController', ['$scope', '$window', 'keyboardService', 'jsMI
     $scope.outputs = [];
     $scope.synthesisOn = false;
     
-    $scope.onMIDIEvent = function(event){
+    $scope.onDeviceMIDIEvent = function(event){
         //console.log("received midi event on controller: ");
         //console.log(event);
         //TODO
@@ -375,7 +375,7 @@ wmpk.controller('mainController', ['$scope', '$window', 'keyboardService', 'jsMI
     
     $scope.reload = function(){
         MIDICapture.init();
-        MIDICapture.setOnMIDIEventCallback($scope.onMIDIEvent);
+        MIDICapture.setOnMIDIEventCallback($scope.onDeviceMIDIEvent);
         
         $scope.inputs = MIDICapture.listInputs();
         $scope.outputs = MIDICapture.listOutputs();
@@ -388,13 +388,27 @@ wmpk.controller('mainController', ['$scope', '$window', 'keyboardService', 'jsMI
     }
     
     $scope.selectOutput = function(index){
-        MIDICapture.Output(index);
+        MIDICapture.selectOutput(index);
     }
     
     $scope.setActive = function(bool){
         $scope.synthesisOn = bool;
         jsMIDIService.setActive($scope.synthesisOn); 
     };
+    
+    //received a note ON event
+    $scope.noteOn = function(midi_id){
+        MIDICapture.noteOn(midi_id);
+    }
+    
+    //received a note OFF event
+    $scope.noteOff = function(midi_id){
+        MIDICapture.noteOff(midi_id);
+    }
+    //register services
+    //console.log(pubSubMIDI);
+    pubSubMIDI.subscribeAnyNoteOn($scope, "noteOn");
+    pubSubMIDI.subscribeAnyNoteOff($scope, "noteOff");
     
     $scope.reload();
     
@@ -577,8 +591,8 @@ wmpk.directive('key', ['$compile', function($compile) {
         element.css("position", "absolute")
                .css("top", scope.key.position.top + offset.top)
                .css("left", scope.key.position.left + offset.left)
-               .css("width", width)
-               .css("height", height)
+               .css("width", width) //TODO fix, not working and I don't understand why
+               .css("height", height)//TODO fix, not working and I don't understand why
                ;
         //on mouse over -> shade
     }

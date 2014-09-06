@@ -134,13 +134,20 @@ MIDICapture = (function() {
     };
     
     noteOn = function(note, velocity){
-        console.log("note On ", note, velocity);
+        //console.log("note On ", note, velocity, output);
         //TODO
+        if(velocity === null || velocity === undefined || velocity === 'undefined'){
+            velocity = 0x7f;
+        }
+        output.send([0x90, note, velocity])
     };
     
     noteOff = function(note, velocity){
-        console.log("note On ", note, velocity);
-        //TODO
+        //console.log("note Off ", note, velocity);
+        if(velocity === null || velocity === undefined || velocity === 'undefined'){
+            velocity = 0x7f;
+        }
+        output.send([0x80, note, velocity])
     };
     
     init = function(){
