@@ -32,7 +32,7 @@ MIDICapture = (function() {
         //console.log("functions setup ok");
         //setupDefault();
         selectInputDevice(0);
-        selectOutputDevice(0);
+        //selectOutputDevice(0);
         //console.log("defaults setup ok");
         //console.log(midi);
         //console.log(input);
@@ -83,11 +83,12 @@ MIDICapture = (function() {
         //for each registered function, cal the function with the midi message
         //TODO make it correct and create register callback functions
         //logRawMIDIEvent(event);
+        console.log(eventCallback !== null)
         if(logEvents){
             logMIDIEvent(event);
         }
         if( eventCallback != null && eventCallback != undefined && eventCallback != 'undefined'){
-            //console.log("calling callback");
+            //console.log("calling callback with event: ", event.data);
             eventCallback(event);
         }else{
             //console.log("no callback activated");
@@ -114,7 +115,7 @@ MIDICapture = (function() {
     
     selectOutputDevice = function(index){
         //console.log("select output device");
-        if(inputs.length > index){
+        if(outputs.length > index){
             output = outputs[index];
             output.ondisconnect = onDisconnect;
         }

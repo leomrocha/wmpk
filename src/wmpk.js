@@ -104,7 +104,7 @@ wmpk.service('pubSubMIDI', [function() {
         this.registerNoteOff[midi_id].push([scope, callback]);
     };
     this.publishNoteOn = function(midi_id){
-        //console.log('publishing note on: ',midi_id);
+        console.log('publishing note on: ',midi_id);
         var cbacks = this.registerNoteOn[midi_id];
         try{
             //call all the generic ones
@@ -126,6 +126,7 @@ wmpk.service('pubSubMIDI', [function() {
         
     };
     this.publishNoteOff = function(midi_id){
+        console.log('publishing note off: ',midi_id);
         var cbacks = this.registerNoteOff[midi_id];
         try{
             //call all the generic ones
@@ -359,16 +360,19 @@ wmpk.controller('mainController', ['$scope', '$window', 'keyboardService', 'jsMI
     
     $scope.onDeviceMIDIEvent = function(event){
         //console.log("received midi event on controller: ");
-        //console.log(event);
+        var code = event.data[0];
         //TODO
-        if(event.data[0] == 0x90){
+        if(code === 0x90){
+            console.log("publishing note on");
             //Note ON
             pubSubMIDI.publishNoteOn(event.data[1])
             //TODO handle velocity
-        }else if(event.data[0] == 0x80){
+        }else if(code === 0x80){
             //Note OFF
+            console.log("publishing note off");
             pubSubMIDI.publishNoteOff(event.data[1]);
         }else{
+            //console.log("event = ", event.data)
             //FUTURE, for the moment, ignore
         }
         
@@ -413,8 +417,9 @@ wmpk.controller('mainController', ['$scope', '$window', 'keyboardService', 'jsMI
     }
     //register services
     //console.log(pubSubMIDI);
-    pubSubMIDI.subscribeAnyNoteOn($scope, "noteOn");
-    pubSubMIDI.subscribeAnyNoteOff($scope, "noteOff");
+    //TODO fix this, this causes a loop in the piano playing that breaks the volume!!!! need to do something to avoid regiving the piano a key to play it the piano (midi input device) was the one that actually did the Note ON (or Note OFF)
+    //pubSubMIDI.subscribeAnyNoteOn($scope, "noteOn");
+    //pubSubMIDI.subscribeAnyNoteOff($scope, "noteOff");
     
     $scope.reload();
     
