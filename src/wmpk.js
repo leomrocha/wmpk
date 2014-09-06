@@ -388,10 +388,12 @@ wmpk.controller('mainController', ['$scope', '$window', 'keyboardService', 'jsMI
     }
      
     $scope.selectInput = function(index){
+        console.log("selecting input ",index);
         MIDICapture.selectInput(index);
     }
     
     $scope.selectOutput = function(index){
+        console.log("selecting output ",index);
         MIDICapture.selectOutput(index);
     }
     
