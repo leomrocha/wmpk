@@ -83,7 +83,7 @@ LeosPiano.Notes.init = function(){
         note.number = i%12;
         note.names = LeosPiano.Notes.names[note.number]
         note.key_color = note.names.length <=1 ? LeosPiano.Notes.WHITE : LeosPiano.Notes.BLACK;
-        note.mapping = 
+        note.mapping = null;
         //TODO synesthesia
         //synesthesia should be calculated at the time
         //note.synestesia = LeosPiano.Notes.get_synesthesia(note.number, "");

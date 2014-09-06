@@ -40,6 +40,8 @@ wmpk.service('pubSubMIDI', [function() {
     this.registerAnyNoteOn = [];
     this.registerAnyNoteOff = [];
     
+    this.eventCallbackRegister = [];
+    
     this.subscribeAnyNoteOn = function(scope, callback){
         //console.log("registering any note on scope with callback: ", scope,callback)    
         this.registerAnyNoteOn.push([scope, callback]);
@@ -48,6 +50,27 @@ wmpk.service('pubSubMIDI', [function() {
         //console.log("registering any note off scope with callback: ", scope,callback)    
         this.registerAnyNoteOff.push([scope, callback]);
     }
+    
+    //ANY Event register subscription
+    this.subscribeMIDIEvent = function(scope, callback){
+        //console.log("registering any note on scope with callback: ", scope,callback)    
+        this.eventCallbackRegister.push([scope, callback]);
+    };
+    //ANY Event publishing
+    this.publishMIDIEvent = function(event){
+        //console.log('publishing note on: ',midi_id);
+        try{
+            //call all the generic ones
+            for(var j=0; j< this.eventCallbackRegister.length; j++){
+                var sc = this.eventCallbackRegister[j];
+                sc[0][sc[1]](event);
+            }
+        }catch(err){
+            //nothing to see here ... move along
+        }
+        
+    };
+    
     /*
      * Subscribes to note on event
      * midi_id id in midi notation: int
@@ -125,6 +148,8 @@ wmpk.service('pubSubMIDI', [function() {
             //nothing to see here ... move along
         }
     };
+    
+    
 }]);
 
 
@@ -132,12 +157,13 @@ wmpk.service('pubSubMIDI', [function() {
 ////////////////////////////////////////////////////////////////////////////////
 //service wrapper for MIDI.js
 ////////////////////////////////////////////////////////////////////////////////
-wmpk.service('midiService', ['pubSubMIDI', function(pubSubMIDI) {
-    //console.log("creating midiService");
+wmpk.service('jsMIDIService', ['pubSubMIDI', function(pubSubMIDI) {
+    //console.log("creating jsMIDIService");
     ////////////////////
     //TODO take this hardcoded thing away and add the possibility to change keyboard layout!
     this.self = this;
     this.notesStatus = []
+    this.active = true; //defaults to true, if false no sound should be generated
     
     //nice loader circle thing
 	Event.add("body", "ready", function() {
@@ -159,20 +185,32 @@ wmpk.service('midiService', ['pubSubMIDI', function(pubSubMIDI) {
     //things to be able to play
     //TODO make the calls more general, although for the moment this works
     this.playNote= function(midi_id){
-        console.log("calling midi service note on: ", midi_id);
-        if(! this.notesStatus[midi_id] === true){
+        //console.log("calling midi service note on: ", midi_id);
+        if(this.active && !this.notesStatus[midi_id] === true){
             this.notesStatus[midi_id] = true;
             MIDI.noteOn(0, midi_id, 127, 0);
         }
     };
     
     this.stopNote= function(midi_id){
-        console.log("calling midi service note off: ", midi_id);
-        if(this.notesStatus[midi_id] === true){
+        //console.log("calling midi service note off: ", midi_id);
+        if(this.active && this.notesStatus[midi_id] === true){
             this.notesStatus[midi_id] = false;
             MIDI.noteOff(0, midi_id, 0);
         }
         
+    };
+    
+    this.activate = function(){
+        this.active = true;
+    };
+    
+    this.deactivate = function(){
+        this.active = false;
+    };
+    
+    this.setActive = function(bool){
+        this.active = bool;
     };
     //
     //register services
@@ -215,86 +253,16 @@ wmpk.service('midiRecorderService', ['pubSubMIDI', function(pubSubMIDI) {
     this.noteOff = function(midi_id){
         //TODO
     }
+    
+    this.onMIDIEvent = function(e){
+        console.log("MIDI Event: ");
+        console.log(e);
+    }
     //register services
     //console.log(pubSubMIDI);
     pubSubMIDI.subscribeAnyNoteOn(this, "noteOn");
     pubSubMIDI.subscribeAnyNoteOff(this, "noteOff");
 }]);
-
-////////////////////////////////////////////////////////////////////////////////
-// Simple Player Service
-////////////////////////////////////////////////////////////////////////////////
-// Tempos: 
-// 1 semifusa
-// 2 fusa
-// 4 semi corchea
-// 8 corchea
-// 16 negra
-// 32 blanca
-// 64 redonda
-//
-
-
-wmpk.service('simplePlayer', ['$timeout', 'pubSubMIDI', function($timeout, pubSubMIDI) {
-
-    this.self = this;
-    var self = this;
-    //simple player that plays a secuence of notes in the format:
-    self.sequence = [];
-    //default bpm
-    self.bpm = 60;
-    //16 is the code for black key
-    self.tempoMultiplier = (1000 * self.bpm) / (60 * 16);
-    
-    self.playNext = function(index){
-        console.log("play next: ",index)
-        idxOff = index - 1;
-        //turn off previous note
-        if(idxOff>=0 && idxOff < self.sequence.length){
-            pubSubMIDI.publishNoteOff(self.sequence[idxOff][0]);
-        }
-        
-        if(index < self.sequence.length){
-            //play note 
-            note = self.sequence[index][0];
-            playTime = self.sequence[index][2] * self.tempoMultiplier;
-            //play next note
-            pubSubMIDI.publishNoteOn(note);
-            //TODO wait play time
-            //note OFF will be called on the callback
-            $timeout(function(){
-                    //console.log("calling timeout callback: ", $scope);
-                    console.log(this)
-                    self.playNext(index+1);
-                    }, 
-                    playTime
-                    );
-        }else{
-            console.log("play sequence finished");
-            //finished playing
-            //callback to the caller!
-            self.callback();
-            //$scope.fini        
-        }
-    };
-    
-    self.setbpm = function(bpm){
-        self.bpm = bpm;
-        self.tempoMultiplier = (1000 * self.bpm) / (60 * 16);
-    };
-    
-    self.play = function(sequence, callbackScope, callbackFunctionName){
-        console.log("playing: ",sequence);
-    //self.play = function(sequence){
-        //set sequence
-        self.sequence = sequence;
-        //set callback
-        self.callback = callbackScope[callbackFunctionName];
-        self.playNext(0);
-    };
-    
-}]);
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //Keyboard mapper sevices
@@ -350,15 +318,25 @@ wmpk.service('keyboardService', ['pubSubMIDI', function(pubSubMIDI) {
 ////////////////////////////////////////////////////////////////////////////////
 // MIDI interface capture
 ////////////////////////////////////////////////////////////////////////////////
-  
+wmpk.service('MIDICaptureService', [function() {
 
+    var capture = MIDICapture; //there is a dependency here, see how to enforce it
+
+    this.reload = function(){
+        capture.init();
+    }
+    
+    capture.init();
+    
+         
+}]);
 ////////////////////////////////////////////////////////////////////////////////
 // CONTROLLERS
 ////////////////////////////////////////////////////////////////////////////////
 
-wmpk.controller('mainController', ['$scope', '$window', 'keyboardService', 'midiService', function($scope, $window, kbService, midiService) {
+wmpk.controller('mainController', ['$scope', '$window', 'keyboardService', 'jsMIDIService', 'pubSubMIDI', function($scope, $window, kbService, jsMIDIService, pubSubMIDI) {
     
-    //midiService.init();
+    
     angular.element($window).on('keydown', function(e) {
         console.log("Key down: ", e.keyCode);
         //TODO call the keyboard processor
@@ -371,6 +349,55 @@ wmpk.controller('mainController', ['$scope', '$window', 'keyboardService', 'midi
         kbService.keyReleased(e);
     });
     
+    //console.log(MIDIInterface);
+    
+    $scope.inputs = [];
+    $scope.outputs = [];
+    $scope.synthesisOn = false;
+    
+    $scope.onMIDIEvent = function(event){
+        //console.log("received midi event on controller: ");
+        //console.log(event);
+        //TODO
+        if(event.data[0] == 0x90){
+            //Note ON
+            pubSubMIDI.publishNoteOn(event.data[1])
+            //TODO handle velocity
+        }else if(event.data[0] == 0x80){
+            //Note OFF
+            pubSubMIDI.publishNoteOff(event.data[1]);
+        }else{
+            //FUTURE, for the moment, ignore
+        }
+        
+        
+    }
+    
+    $scope.reload = function(){
+        MIDICapture.init();
+        MIDICapture.setOnMIDIEventCallback($scope.onMIDIEvent);
+        
+        $scope.inputs = MIDICapture.listInputs();
+        $scope.outputs = MIDICapture.listOutputs();
+        //MIDICapture.unsetLogEvents();
+        jsMIDIService.setActive($scope.synthesisOn);
+    }
+     
+    $scope.selectInput = function(index){
+        MIDICapture.selectInput(index);
+    }
+    
+    $scope.selectOutput = function(index){
+        MIDICapture.Output(index);
+    }
+    
+    $scope.setActive = function(bool){
+        $scope.synthesisOn = bool;
+        jsMIDIService.setActive($scope.synthesisOn); 
+    };
+    
+    $scope.reload();
+    
   }]);
   
   
@@ -378,6 +405,7 @@ wmpk.controller('keyController', ['$scope', 'pubSubMIDI', function($scope, pubSu
     //console.log('initializing controller: piano key');
     //$scope.lang = window.navigator.userLanguage || window.navigator.language;
     //the current key state
+    //TODO add that if mouse is pressed when pointer hovers, it plays the note (this can create nice effects)
     $scope.pressed = false;
     //$scope.hideKey = ;
     $scope.hideKeyName = false;
@@ -429,56 +457,93 @@ wmpk.controller('keyController', ['$scope', 'pubSubMIDI', function($scope, pubSu
     /////////////////////////////////////////////////////////////
   }]);
 
-//TODO make this more generic instead of all hardcoded
-wmpk.controller('keyboardController', ['$scope', function($scope) {
-    //////////////////////////////////////
-    //TODO take out this hardcoded thing and make it configurable
-    //console.log("starting keyboard controller");
-    //var keys_ids = _.range(48, 72); //2 octaves
-    //var keys_ids = _.range(36, 72); //3 octaves
-    //var keys_ids = _.range(45, 72); //2 octaves and 3 keys //leave it this way until made generic if not the keyboard layout will break
-    var keys_ids = _.range(21, 97);
-    $scope.keys = _.map(keys_ids, function(value, key, list){ return LeosPiano.Notes.notes[value];});
-    //END todo
+wmpk.controller('keyboardController', ['$scope', '$window', function($scope, $window) {
     
-    ////////////////////////////////////////////////////////////////////////////
-    //WARNING this is an ugly hack but I can't see how to do it elsewhere
-    //TODO do it in an init function
-    //     do also a cleanup function to be able to take everything away when changing the size of the keyboard
-    ipos = {top: 0, left: 0};
-    var xpos = 0;
-    var syn = MusicTheory.Synesthesia.data["Steve Zieverink (2004)"];
+    //$scope.beginKey = 21;
+    //$scope.endKey = 97;
+    $scope.beginKey = 35;
+    $scope.endKey = 85;
+    $scope.keys = [];
     
-    for(var i=0; i<$scope.keys.length; i++){
-        var key = $scope.keys[i];
-        //ugly neyboard mapping:
-        //key.label = $scope.layout_FR[i];
-        //key.label2 = $scope.layout_EN[i];
-        //ugly synesthesia setup
-        var hsl_val = syn[key.number];
-        //convert to RGB
-        var hsl = {H: hsl_val[0], S: hsl_val[1], L:hsl_val[2]};
-        //this transformation is because I've fixed the synesthesic theme already
-        //TODO make it more general to be able to change the synesthesic theme
-        var rgb = Color.Space.HSL_RGB(hsl);
-        rgb = {R:Math.floor(rgb.R), G:Math.floor(rgb.G), B:Math.floor(rgb.B)};
-        //console.log("convertion: ", hsl, " to rgb : ", rgb);
-        key.synesthesia = rgb;
-        //ugly to decide position
-        if(key.key_color == LeosPiano.Notes.WHITE){
-            
-            ipos = {top: 0, left: xpos};
-            key.position = ipos;
-            xpos = xpos + 40;
-        }else{
-            //NOTE should NEVER start with a black key, or this will break
-            ipos = {top: 0, left: xpos -20};
-            key.position = ipos;
+    $scope.screenWidth = 0;
+    $scope.whiteWidth = 40;
+    $scope.whiteHeight = 200;
+    $scope.blackWidth = 30;
+    $scope.blackHeight = 120;
+    
+    $scope.erase = function(){
+        for(var i in $scope.keys){
+            delete($scope.keys[i]);
         }
-     //console.log("keys = ", $scope.keys);
-    }
-    //END ugly hack
-    ////////////////////////////////////////////////////////////////////////////
+        $scope.keys = [];
+    };
+    
+    $scope.getSizes = function(){
+        //get width of the screen
+        //get the number of keys
+        $scope.screenWidth = $window.innerWidth;
+        var nkeys = $scope.endKey - $scope.beginKey +1;
+        $scope.whiteWidth = $scope.screenWidth / nkeys;
+        $scope.blackWidth = $scope.whiteWidth * 3.0 /4.0;
+        $scope.whiteHeight = $scope.whiteWidth * 5;
+        $scope.blackHeight = $scope.whiteWidth * 3;
+    };
+    
+
+    $scope.init = function(){    
+        //$scope.getSizes(); //TODO activate this and fix it!
+        var keys_ids = _.range($scope.beginKey, $scope.endKey); 
+        $scope.keys = _.map(keys_ids, function(value, key, list){ return LeosPiano.Notes.notes[value];});
+        //END todo
+        //console.log($scope.keys);
+        
+        ////////////////////////////////////////////////////////////////////////////
+        //WARNING this is an ugly hack but I can't see how to do it elsewhere
+        //TODO do it in an init function
+        //     do also a cleanup function to be able to take everything away when changing the size of the keyboard
+        ipos = {top: 0, left: 0};
+        var xpos = 0;
+        var syn = MusicTheory.Synesthesia.data["Steve Zieverink (2004)"];
+        
+        for(var i=0; i<$scope.keys.length; i++){
+            var key = $scope.keys[i];
+            //console.log("key: ", key);
+            //ugly neyboard mapping:
+            //key.label = $scope.layout_FR[i];
+            //key.label2 = $scope.layout_EN[i];
+            //ugly synesthesia setup
+            var hsl_val = syn[key.number];
+            //convert to RGB
+            var hsl = {H: hsl_val[0], S: hsl_val[1], L:hsl_val[2]};
+            //this transformation is because I've fixed the synesthesic theme already
+            //TODO make it more general to be able to change the synesthesic theme
+            var rgb = Color.Space.HSL_RGB(hsl);
+            rgb = {R:Math.floor(rgb.R), G:Math.floor(rgb.G), B:Math.floor(rgb.B)};
+            //console.log("convertion: ", hsl, " to rgb : ", rgb);
+            key.synesthesia = rgb;
+            //ugly to decide position
+            if(key.key_color == LeosPiano.Notes.WHITE){
+                
+                ipos = {top: 0, left: xpos};
+                key.position = ipos;
+                xpos = xpos + $scope.whiteWidth; 
+            }else{
+                //NOTE should NEVER start with a black key, or this will break
+                ipos = {top: 0, left: xpos -($scope.whiteWidth/2)}; 
+                key.position = ipos;
+            }
+         //console.log("keys = ", $scope.keys);
+        }
+        //END ugly hack
+        ////////////////////////////////////////////////////////////////////////////
+    };
+    
+    $scope.reset = function(){
+        $scope.erase();
+        $scope.init();
+    };
+    
+    $scope.init();
   }]);
 
   
@@ -499,17 +564,21 @@ wmpk.directive('key', ['$compile', function($compile) {
         //console.log("element ", element);
         //console.log("attrs = ", attrs);
         //console.log(scope.key);
-        width = scope.key.key_color == LeosPiano.Notes.WHITE ? 40 : 30; //TODO change here the dimensions dynamically
-        height = scope.key.key_color == LeosPiano.Notes.WHITE ? 200 : 120; //TODO change here the dimensions dynamically
+        width = scope.key.key_color == LeosPiano.Notes.WHITE ? scope.$parent.whiteWidth : scope.$parent.blackWidth;
+        height = scope.key.key_color == LeosPiano.Notes.WHITE ? scope.$parent.whiteHeight : scope.$parent.blackHeight;
+        //console.log("key dimensions: ", width, height)
         element.width(width);
         element.height(height);
         var offset = element.parent().offset();
         
         //console.log(scope.key.position)
         //setup position to make it look like a piano
+        //console.log(element);
         element.css("position", "absolute")
                .css("top", scope.key.position.top + offset.top)
                .css("left", scope.key.position.left + offset.left)
+               .css("width", width)
+               .css("height", height)
                ;
         //on mouse over -> shade
     }
@@ -521,4 +590,5 @@ wmpk.directive('key', ['$compile', function($compile) {
         templateUrl: "templates/key.html"
     };
   }]);
+
 
