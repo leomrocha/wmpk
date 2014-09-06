@@ -352,7 +352,9 @@ wmpk.controller('mainController', ['$scope', '$window', 'keyboardService', 'jsMI
     //console.log(MIDIInterface);
     
     $scope.inputs = [];
+    $scope.input = null;
     $scope.outputs = [];
+    $scope.output = null;
     $scope.synthesisOn = false;
     
     $scope.onDeviceMIDIEvent = function(event){
@@ -378,7 +380,9 @@ wmpk.controller('mainController', ['$scope', '$window', 'keyboardService', 'jsMI
         MIDICapture.setOnMIDIEventCallback($scope.onDeviceMIDIEvent);
         
         $scope.inputs = MIDICapture.listInputs();
+        $scope.input = $scope.inputs[0];
         $scope.outputs = MIDICapture.listOutputs();
+        $scope.output = $scope.outputs[0];
         //MIDICapture.unsetLogEvents();
         jsMIDIService.setActive($scope.synthesisOn);
     }
@@ -391,7 +395,7 @@ wmpk.controller('mainController', ['$scope', '$window', 'keyboardService', 'jsMI
         MIDICapture.selectOutput(index);
     }
     
-    $scope.setActive = function(bool){
+    $scope.setSoundActive = function(bool){
         $scope.synthesisOn = bool;
         jsMIDIService.setActive($scope.synthesisOn); 
     };
@@ -511,10 +515,6 @@ wmpk.controller('keyboardController', ['$scope', '$window', function($scope, $wi
         //END todo
         //console.log($scope.keys);
         
-        ////////////////////////////////////////////////////////////////////////////
-        //WARNING this is an ugly hack but I can't see how to do it elsewhere
-        //TODO do it in an init function
-        //     do also a cleanup function to be able to take everything away when changing the size of the keyboard
         ipos = {top: 0, left: 0};
         var xpos = 0;
         var syn = MusicTheory.Synesthesia.data["Steve Zieverink (2004)"];
