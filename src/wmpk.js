@@ -380,21 +380,21 @@ wmpk.controller('mainController', ['$scope', '$window', 'keyboardService', 'jsMI
         MIDICapture.setOnMIDIEventCallback($scope.onDeviceMIDIEvent);
         
         $scope.inputs = MIDICapture.listInputs();
-        $scope.input = $scope.inputs[0];
+        //$scope.input = $scope.inputs[0];
         $scope.outputs = MIDICapture.listOutputs();
-        $scope.output = $scope.outputs[0];
+        //$scope.output = $scope.outputs[0];
         //MIDICapture.unsetLogEvents();
         jsMIDIService.setActive($scope.synthesisOn);
     }
      
     $scope.selectInput = function(index){
         console.log("selecting input ",index);
-        MIDICapture.selectInput(index);
+        MIDICapture.selectInputDevice(index);
     }
     
     $scope.selectOutput = function(index){
         console.log("selecting output ",index);
-        MIDICapture.selectOutput(index);
+        MIDICapture.selectOutputDevice(index);
     }
     
     $scope.setSoundActive = function(bool){
