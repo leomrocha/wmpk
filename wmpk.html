@@ -49,12 +49,10 @@
                                 </a>
                                 <a class="btn btn-default btn-lg" ng-click="setSoundActive(false)" ng-show="synthesisOn">
                                     <i class="fa fa-volume-up fa-fw"></i>
-                                    <i class="fa fa-toggle-on fa-fw"></i>
                                     <span class="network-name">Toggle Sound</span>
                                 </a>
                                 <a class="btn btn-default btn-lg" ng-click="setSoundActive(true)" ng-hide="synthesisOn">
                                     <i class="fa fa-volume-off fa-fw"></i>
-                                    <i class="fa fa-toggle-off fa-fw"></i>
                                     <span class="network-name">Toggle Sound</span>
                                 </a>
                             </div>
@@ -63,7 +61,7 @@
                                 <span >MIDI Input: </span>
                                 <select ng-model="input" 
                                         ng-change="selectInput(input[0])" 
-                                        ng-options="input for input in inputs" 
+                                        ng-options="i for i in inputs" 
                                         data-toggle="tooltip" data-placement="top"
                                         title="Input MIDI Device">
                                 </select>
@@ -71,7 +69,7 @@
                                 <span >MIDI Output: </span>
                                 <select ng-model="output" 
                                         ng-change="selectOutput(output[0])" 
-                                        ng-options="output for output in outputs"
+                                        ng-options="o for o in outputs"
                                         data-toggle="tooltip" data-placement="top"
                                         title="Output MIDI Device">
                                 </select>
