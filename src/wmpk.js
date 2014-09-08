@@ -174,7 +174,7 @@ wmpk.service('jsMIDIService', ['pubSubMIDI', function(pubSubMIDI) {
     this.init = function(){
         //load midi
 	    MIDI.loadPlugin({
-		    soundfontUrl: "../assets/soundfonts/",
+		    soundfontUrl: "assets/soundfonts/",
 		    instrument: "acoustic_grand_piano",
 		    callback: function() {
 			    MIDI.loader.stop();
