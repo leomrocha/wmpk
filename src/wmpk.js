@@ -357,6 +357,7 @@ wmpk.controller('mainController', ['$scope', '$window', 'keyboardService', 'jsMI
     $scope.outputs = [];
     $scope.output = null;
     $scope.synthesisOn = false;
+    $scope.isMIDISupported = false;
     
     $scope.onDeviceMIDIEvent = function(event){
         //console.log("received midi event on controller: ");
@@ -380,15 +381,22 @@ wmpk.controller('mainController', ['$scope', '$window', 'keyboardService', 'jsMI
     }
     
     $scope.reload = function(){
-        MIDICapture.init();
-        MIDICapture.setOnMIDIEventCallback($scope.onDeviceMIDIEvent);
-        
-        $scope.inputs = MIDICapture.listInputs();
-        //$scope.input = $scope.inputs[0];
-        $scope.outputs = MIDICapture.listOutputs();
-        //$scope.output = $scope.outputs[0];
-        //MIDICapture.unsetLogEvents();
-        jsMIDIService.setActive($scope.synthesisOn);
+        try{
+            MIDICapture.init();
+            MIDICapture.setOnMIDIEventCallback($scope.onDeviceMIDIEvent);
+            
+            $scope.inputs = MIDICapture.listInputs();
+            //$scope.input = $scope.inputs[0];
+            $scope.outputs = MIDICapture.listOutputs();
+            //$scope.output = $scope.outputs[0];
+            //MIDICapture.unsetLogEvents();
+            jsMIDIService.setActive($scope.synthesisOn);
+            $scope.isMIDISupported = true;
+        }
+        catch(err){
+            console.log("MIDI capture not supported");
+            $scope.isMIDISupported = false;
+        }
     }
      
     $scope.selectInput = function(index){

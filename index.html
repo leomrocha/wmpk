@@ -57,22 +57,33 @@
                                 </a>
                             </div>
                             <div class="col-lg-6 col-md-6">
-                            <!--Select your instrument:--> 
-                                <span >MIDI Input: </span>
-                                <select ng-model="input" 
-                                        ng-change="selectInput(input[0])" 
-                                        ng-options="i for i in inputs" 
-                                        data-toggle="tooltip" data-placement="top"
-                                        title="Input MIDI Device">
-                                </select>
-                                <br/>
-                                <span >MIDI Output: </span>
-                                <select ng-model="output" 
-                                        ng-change="selectOutput(output[0])" 
-                                        ng-options="o for o in outputs"
-                                        data-toggle="tooltip" data-placement="top"
-                                        title="Output MIDI Device">
-                                </select>
+                                <div ng-show="isMIDISupported" >
+                                    <span >MIDI Input: </span>
+                                    <select ng-model="input" 
+                                            ng-change="selectInput(input[0])" 
+                                            ng-options="i for i in inputs" 
+                                            data-toggle="tooltip" data-placement="top"
+                                            title="Input MIDI Device">
+                                    </select>
+                                    <br/>
+                                    <span >MIDI Output: </span>
+                                    <select ng-model="output" 
+                                            ng-change="selectOutput(output[0])" 
+                                            ng-options="o for o in outputs"
+                                            data-toggle="tooltip" data-placement="top"
+                                            title="Output MIDI Device">
+                                    </select>
+                                </div>
+                                <div ng-hide="isMIDISupported" style="color:red;">
+                                    <p>MIDI interface not supported. </p>
+                                    <br/>
+                                    <p>
+                                        Please use Chrome or Chromium and activate the MIDI support:
+                                        <br/>
+                                         chrome://flags/‪#‎enable‬-web-midi
+                                    </p>
+                                    Support for other browsers will be aded with a plugin.
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -83,7 +94,7 @@
             <div  >
                 <div class="keyboard" ng-controller="keyboardController">
                     <div keyboard>
-                        Sorry, your Browser does not support HTML5, please use the latests Chrome Browser
+                        Sorry, your Browser does not support HTML5, please use the latests Chrome Browser.
                     </div>
                 </div>
             </div>
